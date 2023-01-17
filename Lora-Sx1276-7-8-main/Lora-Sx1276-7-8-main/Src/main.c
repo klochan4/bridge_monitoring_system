@@ -11,7 +11,6 @@
 #include "..\Src\definitions.h"
 
 
-#warning TODO: measure data only if energy is above some threshold
 #warning TODO: distance tests
 #warning TODO: power consumption tests
 #warning TODO: general test the SU on steel rod
@@ -215,6 +214,15 @@ SAMPLE_DATA_TYPE y_axis_samples[SAMPLE_SIZE];
 SAMPLE_DATA_TYPE z_axis_samples[SAMPLE_SIZE];
 #endif
 
+
+bool seedSet = false;
+
+void setSeedForRandFunct(){
+	if(!seedSet){
+		srand(HAL_GetTick());
+		seedSet = true;
+	}
+}
 
 void generateGenericLoraHeader(uint8_t* packet, int destinationAddress, int sourceAddress, int packetType, int sessionId, int packetId){
 	setHeaderField(packet, LORA_PACKET_DESTINATION_ADDRESS_INDEX, LORA_PACKET_DESTINATION_ADDRESS_BYTE_LENGTH, destinationAddress);
@@ -1004,6 +1012,8 @@ int main(void)
 		HAL_Delay(NOTIFY_LED_ON_TIME);
   }
 	#endif
+	printLine("Done configuring LoRa module");
+	
 	
 	#if CENTRAL_UNIT == 1
 	HAL_GPIO_WritePin(ESP_EN_PORT, ESP_EN_PIN, GPIO_PIN_SET);
@@ -1012,9 +1022,7 @@ int main(void)
 	printLine("ESP32 enabled");
 	#endif
 
-	printLine("Done configuring LoRa module");
-	
-	
+
 	#endif
 
 	
@@ -1130,6 +1138,7 @@ int main(void)
 		
 		
 		if(HAL_GPIO_ReadPin(SWITCH1_PORT, SWITCH1_PIN) == GPIO_PIN_SET){
+			setSeedForRandFunct();
 			
 			ENABLE_USER_ACTION_LED();
 			HAL_Delay(NOTIFY_LED_ON_TIME);
